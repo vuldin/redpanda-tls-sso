@@ -1,0 +1,79 @@
+version: "3.9"
+
+services:
+
+  redpanda-0.local:
+    container_name: redpanda-0.local
+    image: docker.vectorized.io/vectorized/redpanda:latest
+    command:
+    - redpanda start
+    - --smp 1
+    - --memory 1G
+    volumes:
+    - ./redpanda-config/redpanda-0:/etc/redpanda
+    - ./redpanda-data/redpanda-0:/var/lib/redpanda/data
+    - ./redpanda-config/certs:/certs
+    ports:
+    - 9092:9092
+    - 9644:9644
+    - 8081:8081
+    - 8082:8082
+    - 33045:33045
+
+  redpanda-1.local:
+    container_name: redpanda-1.local
+    image: docker.vectorized.io/vectorized/redpanda:latest
+    command:
+    - redpanda start
+    - --smp 1
+    - --memory 1G
+    volumes:
+    - ./redpanda-config/redpanda-1:/etc/redpanda
+    - ./redpanda-data/redpanda-1:/var/lib/redpanda/data
+    - ./redpanda-config/certs:/certs
+    ports:
+    - 9192:9192
+    - 9744:9744
+    - 8181:8181
+    - 8182:8182
+    - 33145:33145
+
+  redpanda-2.local:
+    container_name: redpanda-2.local
+    image: docker.vectorized.io/vectorized/redpanda:latest
+    command:
+    - redpanda start
+    - --smp 1
+    - --memory 1G
+    volumes:
+    - ./redpanda-config/redpanda-2:/etc/redpanda
+    - ./redpanda-data/redpanda-2:/var/lib/redpanda/data
+    - ./redpanda-config/certs:/certs
+    ports:
+    - 9292:9292
+    - 9844:9844
+    - 8281:8281
+    - 8282:8282
+    - 33245:33245
+
+  console:
+    container_name: redpanda-console
+    # image: docker.redpanda.com/redpandadata/console:latest
+    image: docker.redpanda.com/redpandadata/console-unstable:add-tls-termination-0e5fece
+    command: -c '/app/console'
+    entrypoint: /bin/sh
+    hostname: redpanda-console
+    volumes:
+    - ./console-config:/tmp
+    - ./certs:/certs
+    - ./license:/license
+    environment:
+      CONFIG_FILEPATH: /tmp/redpanda-console-config.yml
+    ports:
+    - 8080:8080
+    - 443:443
+    depends_on:
+    - redpanda-0.local
+    - redpanda-1.local
+    - redpanda-2.local
+

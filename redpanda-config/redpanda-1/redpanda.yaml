@@ -1,0 +1,82 @@
+redpanda:
+    data_directory: /var/lib/redpanda/data
+    empty_seed_starts_cluster: false
+    seed_servers:
+        - host:
+            address: redpanda-0.local
+            port: 33045
+        - host:
+            address: redpanda-1.local
+            port: 33145
+        - host:
+            address: redpanda-2.local
+            port: 33245
+    rpc_server:
+        address: 0.0.0.0
+        port: 33145
+    kafka_api:
+        - address: 0.0.0.0
+          port: 9192
+          name: OUTSIDE
+    kafka_api_tls:
+        - name: OUTSIDE
+          key_file: /certs/node.key
+          cert_file: /certs/node.crt
+          truststore_file: /certs/ca.crt
+          enabled: true
+    admin:
+        - address: 0.0.0.0
+          port: 9744
+    admin_api_tls:
+        - key_file: /certs/node.key
+          cert_file: /certs/node.crt
+          truststore_file: /certs/ca.crt
+          enabled: true
+    advertised_rpc_api:
+        address: redpanda-1.local
+        port: 33145
+    advertised_kafka_api:
+        - address: redpanda-1.local
+          port: 9192
+          name: OUTSIDE
+    developer_mode: true
+    auto_create_topics_enabled: true
+    fetch_reads_debounce_timeout: 10
+    group_initial_rebalance_delay: 0
+    group_topic_partitions: 3
+    log_segment_size_min: 1
+    rpc_server_tls: {}
+    storage_min_free_bytes: 10485760
+    topic_partitions_per_shard: 1000
+rpk:
+    coredump_dir: /var/lib/redpanda/coredump
+    overprovisioned: true
+pandaproxy:
+    pandaproxy_api:
+        - address: 0.0.0.0
+          port: 8182
+          name: OUTSIDE
+    advertised_pandaproxy_api:
+        - address: redpanda-1.local
+          port: 8182
+          name: OUTSIDE
+#pandaproxy_client:
+#    brokers:
+#        - address: redpanda-0
+#          port: 9092
+#        - address: redpanda-1
+#          port: 9192
+#        - address: redpanda-2
+#          port: 9292
+#    broker_tls:
+#        enabled: true
+#        require_client_auth: false
+#        key_file: /certs/node.key
+#        cert_file: /certs/node.crt
+#        truststore_file: /certs/ca.crt
+schema_registry:
+    schema_registry_api:
+        - address: 0.0.0.0
+          port: 8181
+          name: OUTSIDE
+

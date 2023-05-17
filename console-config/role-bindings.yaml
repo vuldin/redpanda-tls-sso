@@ -1,0 +1,11 @@
+roleBindings:
+- metadata:
+    name: Developers
+  subjects:
+  - kind: user
+    # provider: Google
+    provider: OIDC
+    #name: josh@redpanda.com
+    name: 100063441999230555503
+  roleName: editor
+

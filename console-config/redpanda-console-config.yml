@@ -1,0 +1,73 @@
+licenseFilepath: /license/redpanda.license
+server:
+  listenPort: 8080
+  #allowedOrigins: ["http://localhost:3000"]
+  httpsListenPort: 443
+  tls:
+    enabled: true
+    certFilepath: /certs/node.crt
+    keyFilepath: /certs/node.key
+kafka:
+  brokers:
+  - "redpanda-0.local:9092"
+  - "redpanda-1.local:9192"
+  - "redpanda-2.local:9292"
+  schemaRegistry:
+    enabled: true
+    urls:
+    - "http://redpanda-0.local:8081"
+    - "http://redpanda-1.local:8181"
+    - "http://redpanda-2.local:8181"
+  tls:
+    # If you connect to a Cluster that uses commonly trusted 
+    # certificates, enable TLS and do not provide a certificate 
+    # authority in the caFilepath. In this case,
+    # the system's cert pool is used.
+    enabled: true
+    caFilepath: "/certs/ca.crt"
+    certFilepath: "/certs/node.crt"
+    keyFilepath: "/certs/node.key"
+    # Can also be set using the --kafka.tls.passphrase flag
+    # passphrase: 
+    # insecureSkipTlsVerify: false
+#  sasl:
+#    enabled: true
+#    username: admin
+#    password: your_password
+#    mechanism: SCRAM-SHA-512
+redpanda:
+  adminApi:
+    enabled: true
+    urls:
+    - "https://redpanda-0.local:9644"
+    - "https://redpanda-1.local:9744"
+    - "https://redpanda-2.local:9844"
+    tls:
+      enabled: true
+      caFilepath: "/certs/ca.crt"
+      certFilepath: "/certs/node.crt"
+      keyFilepath: "/certs/node.key"
+      # insecureSkipTlsVerify:
+login:
+  enabled: true
+  jwtSecret: "<redacted>"
+  useCookieChunking: true
+#  google:
+#    enabled: true
+#    clientId: 825583328664-75eji9og8bu08ch9ok59sbso9iv0gb50.apps.googleusercontent.com
+#    clientSecret: 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
+  oidc:
+    enabled: true
+    clientId: <redacted>
+    clientSecret: <redacted>
+    issuerUrl: https://accounts.google.com
+#    issuerTls:
+#      caFilepath:
+#      certFilepath:
+#      keyFilepath:
+#    userIdentifyingClaimKey: sub
+enterprise:
+  rbac:
+    enabled: true
+    roleBindingsFilepath: /tmp/role-bindings.yaml
+
