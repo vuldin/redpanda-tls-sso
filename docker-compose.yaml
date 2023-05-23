@@ -12,7 +12,6 @@ services:
     volumes:
     - ./redpanda-config/redpanda-0:/etc/redpanda
     - ./redpanda-data/redpanda-0:/var/lib/redpanda/data
-    - ./redpanda-config/certs:/certs
     ports:
     - 9092:9092
     - 9644:9644
@@ -30,7 +29,6 @@ services:
     volumes:
     - ./redpanda-config/redpanda-1:/etc/redpanda
     - ./redpanda-data/redpanda-1:/var/lib/redpanda/data
-    - ./redpanda-config/certs:/certs
     ports:
     - 9192:9192
     - 9744:9744
@@ -48,7 +46,6 @@ services:
     volumes:
     - ./redpanda-config/redpanda-2:/etc/redpanda
     - ./redpanda-data/redpanda-2:/var/lib/redpanda/data
-    - ./redpanda-config/certs:/certs
     ports:
     - 9292:9292
     - 9844:9844
@@ -64,8 +61,8 @@ services:
     entrypoint: /bin/sh
     hostname: redpanda-console
     volumes:
-    - ./console-config:/tmp
-    - ./certs:/certs
+    - ./redpanda-config/redpanda-console:/tmp
+    #- ./redpanda-config/redpanda-console/certs:/certs
     - ./license:/license
     environment:
       CONFIG_FILEPATH: /tmp/redpanda-console-config.yml

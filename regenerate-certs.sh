@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
-mkdir certs private-ca-key
+DOMAIN=$1
+
+sudo chown -R $(whoami):$(whoami) redpanda-config
+mkdir -p redpanda-config/{redpanda-0,redpanda-1,redpanda-2,redpanda-console}/certs
+find redpanda-config/redpanda-*/certs -type d -exec rm -rf {} +
+mkdir -p {ca-public,ca-private}
+rm -f {ca-public,ca-private}/*
 
 rm -f index.txt serial.txt
 touch index.txt
@@ -43,27 +49,32 @@ keyUsage = critical,digitalSignature,keyEncipherment
 extendedKeyUsage = clientAuth
 EOF
 
-openssl genrsa -out private-ca-key/ca.key 2048
-chmod 400 private-ca-key/ca.key
+openssl genrsa -out ca-private/ca.key 2048
+chmod 400 ca-private/ca.key
 
+# TODO what is this key for, it is never used
 openssl req \
 -new \
 -x509 \
 -config ca.cnf \
--key private-ca-key/ca.key \
+-key ca-private/ca.key \
 -days 365 \
 -batch \
--out certs/ca.key
+-out ca-public/ca.key
 
 openssl req \
 -new -x509 \
 -config ca.cnf \
--key private-ca-key/ca.key \
+-key ca-private/ca.key \
 -days 365 \
 -batch \
--out certs/ca.crt
+-out ca-public/ca.crt
 
-cat > node.cnf <<EOF
+for broker in redpanda-0 redpanda-1 redpanda-2 redpanda-console; do
+
+cp ca-public/ca.crt redpanda-config/$broker/certs/
+
+cat > redpanda-config/$broker/node.cnf <<EOF
 # OpenSSL node configuration file
 [ req ]
 prompt=no
@@ -75,40 +86,38 @@ organizationName = Redpanda
 subjectAltName = @alt_names
 
 [ alt_names ]
-DNS.1 = localhost
-DNS.2 = redpanda
-DNS.3 = console
-DNS.4 = connect
-DNS.5 = *.local
+DNS.1 = $broker.$DOMAIN
 IP.1 = 127.0.0.1
 EOF
 
-openssl genrsa -out certs/node.key 2048
-chmod 400 certs/node.key
+openssl genrsa -out redpanda-config/$broker/certs/node.key 2048
+chmod 400 redpanda-config/$broker/certs/node.key
 
 openssl req \
 -new \
--config node.cnf \
--key certs/node.key \
--out node.csr \
+-config redpanda-config/$broker/node.cnf \
+-key redpanda-config/$broker/certs/node.key \
+-out redpanda-config/$broker/node.csr \
 -batch
 
 openssl ca \
 -config ca.cnf \
--keyfile private-ca-key/ca.key \
--cert certs/ca.crt \
+-keyfile ca-private/ca.key \
+-cert redpanda-config/$broker/certs/ca.crt \
 -policy signing_policy \
 -extensions signing_node_req \
--out certs/node.crt \
--outdir certs/ \
--in node.csr \
+-out redpanda-config/$broker/certs/node.crt \
+-outdir redpanda-config/$broker/certs/ \
+-in redpanda-config/$broker/node.csr \
 -batch
 
-openssl x509 -in certs/node.crt -text | grep "X509v3 Subject Alternative Name" -A 1
+openssl x509 -in redpanda-config/$broker/certs/node.crt -text | grep "X509v3 Subject Alternative Name" -A 1
 
-# copy certificates for redpanda
-sudo cp -a certs redpanda-config/certs
-sudo chown -R 101:101 redpanda-config/certs
+rm redpanda-config/$broker/{node.cnf,node.csr}
 
-rm ca.cnf index.txt index.txt.attr index.txt.old node.cnf node.csr serial.txt serial.txt.old
+done
+
+find redpanda-config/*/certs -type f -name "*.pem" -delete
+sudo chown -R 101:101 redpanda-config/{redpanda-0,redpanda-1,redpanda-2}
+rm ca.cnf index.txt index.txt.attr index.txt.attr.old index.txt.old serial.txt serial.txt.old
 

@@ -5,8 +5,8 @@ server:
   httpsListenPort: 443
   tls:
     enabled: true
-    certFilepath: /certs/node.crt
-    keyFilepath: /certs/node.key
+    certFilepath: /tmp/certs/node.crt
+    keyFilepath: /tmp/certs/node.key
 kafka:
   brokers:
   - "redpanda-0.local:9092"
@@ -24,9 +24,9 @@ kafka:
     # authority in the caFilepath. In this case,
     # the system's cert pool is used.
     enabled: true
-    caFilepath: "/certs/ca.crt"
-    certFilepath: "/certs/node.crt"
-    keyFilepath: "/certs/node.key"
+    caFilepath: "/tmp/certs/ca.crt"
+    certFilepath: "/tmp/certs/node.crt"
+    keyFilepath: "/tmp/certs/node.key"
     # Can also be set using the --kafka.tls.passphrase flag
     # passphrase: 
     # insecureSkipTlsVerify: false
@@ -44,13 +44,13 @@ redpanda:
     - "https://redpanda-2.local:9844"
     tls:
       enabled: true
-      caFilepath: "/certs/ca.crt"
-      certFilepath: "/certs/node.crt"
-      keyFilepath: "/certs/node.key"
+      caFilepath: "/tmp/certs/ca.crt"
+      certFilepath: "/tmp/certs/node.crt"
+      keyFilepath: "/tmp/certs/node.key"
       # insecureSkipTlsVerify:
 login:
-  enabled: true
-  jwtSecret: "<redacted>"
+  enabled: false
+  jwtSecret: "tlh1EHRh5FQUBPSAF4VbopESOVYkWGhv"
   useCookieChunking: true
 #  google:
 #    enabled: true
@@ -68,6 +68,6 @@ login:
 #    userIdentifyingClaimKey: sub
 enterprise:
   rbac:
-    enabled: true
+    enabled: false
     roleBindingsFilepath: /tmp/role-bindings.yaml
 

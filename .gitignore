@@ -1,4 +1,6 @@
-certs
 license
-private-ca-key
+ca-private
+ca-public
 redpanda-data
+redpanda-config/*/certs
+
